@@ -5,11 +5,17 @@ import com.zoo.demo.entity.Animal;
 import com.zoo.demo.exceptions.AnimalNotFound;
 import com.zoo.demo.repository.AnimalRepository;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -35,8 +41,14 @@ public class AnimalService {
     return animalRepository.save(animal);
   }
 
-  public List<Animal> getAllAnimals() {
-    return animalRepository.findAllByOrderById();
+  public List<Animal> getAllAnimals(Specification<Animal> specification, Pageable paging) {
+   Page<Animal> pagedResult = animalRepository.findAll(specification, paging);
+
+   if(pagedResult.hasContent()) {
+    return pagedResult.getContent();
+   } else {
+    return new ArrayList<Animal>();
+   }
   }
 
  public Animal getAnimalById(Long id) {
