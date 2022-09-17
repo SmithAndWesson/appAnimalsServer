@@ -10,10 +10,11 @@ public class AnimalDTO {
   private Long id;
   @NotEmpty
   private String name;
-  @NotEmpty
   private String breed;
   private Long age;
+  @NotEmpty
   private String gender;
+  @NotEmpty
   private String owner_name;
   @NotEmpty
   private String owner_email;
