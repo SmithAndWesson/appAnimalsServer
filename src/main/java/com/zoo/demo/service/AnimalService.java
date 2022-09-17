@@ -41,14 +41,10 @@ public class AnimalService {
     return animalRepository.save(animal);
   }
 
-  public List<Animal> getAllAnimals(Specification<Animal> specification, Pageable paging) {
+  public Page<Animal> getAllAnimals(Specification<Animal> specification, Pageable paging) {
    Page<Animal> pagedResult = animalRepository.findAll(specification, paging);
 
-   if(pagedResult.hasContent()) {
-    return pagedResult.getContent();
-   } else {
-    return new ArrayList<Animal>();
-   }
+   return pagedResult;
   }
 
  public Animal getAnimalById(Long id) {

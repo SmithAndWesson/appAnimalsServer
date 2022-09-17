@@ -8,7 +8,10 @@ import com.zoo.demo.service.AnimalService;
 import com.zoo.demo.specifications.AnimalSpecification;
 import com.zoo.demo.specifications.AnimalsSpecificationsBuilder;
 import com.zoo.demo.validations.ResponseErrorValidation;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -61,7 +64,7 @@ public class AnimalCntroller {
   }
 
  @GetMapping("/all")
-  public ResponseEntity<List<AnimalDTO>> getAllAnimals(
+  public ResponseEntity<Map<String, Object>>  getAllAnimals(
       @RequestParam(defaultValue = "filter") String filter,
       @RequestParam(defaultValue = "0") int _start,
       @RequestParam(defaultValue = "10") int _end,
@@ -82,14 +85,25 @@ public class AnimalCntroller {
     Pageable paging = PageRequest.of(page, size, Sort.by(
         _order.equals("desc") ? Direction.DESC : Direction.ASC,_sort));
 
-    List<AnimalDTO> AnimalDTOList = animalService.getAllAnimals(spec, paging)
+   Page<Animal> pagedResult = animalService.getAllAnimals(spec, paging);
+    if(pagedResult.hasContent()) {
+      List<AnimalDTO> AnimalDTOList = pagedResult.getContent()
           .stream()
           .map(animalFacade::animalToAnimalDTO)//animal -> animalFacade.animalToAnimalDTO(animal)
           .collect(Collectors.toList());
 
+      Map<String, Object> response = new HashMap<>();
+      response.put("animals", AnimalDTOList);
+      response.put("currentPage", pagedResult.getNumber());
+      response.put("totalItems", pagedResult.getTotalElements());
+      response.put("totalPages", pagedResult.getTotalPages());
+
+      return new ResponseEntity<>(response, HttpStatus.OK);
+   } else {
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+   }
 
 
-    return new ResponseEntity<>(AnimalDTOList, HttpStatus.OK);
   }
 
   @PostMapping("/{animalId}/delete")
