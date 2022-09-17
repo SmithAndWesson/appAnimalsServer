@@ -20,9 +20,9 @@ public class Animal {
   private Long id;
   @Column(nullable = false)
   private String name;
-  @Column()
+  @Column(nullable=true)
   private String breed;
-  @Column()
+  @Column(nullable=true)
   private Long age;
   @Column(nullable = false)
   private String gender;
